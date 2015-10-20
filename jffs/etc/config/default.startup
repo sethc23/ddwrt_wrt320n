@@ -1,0 +1,5 @@
+#!/bin/sh
+mount --bind /jffs/etc/ipkg.conf /etc/ipkg.conf
+for I in `/bin/ls /jffs/etc/init.d/*`;do
+    sh $I
+done

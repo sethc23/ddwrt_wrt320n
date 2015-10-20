@@ -1,0 +1,1 @@
+OPTIONS="-d -c /jffs/etc/ulogd.conf > /dev/null"
