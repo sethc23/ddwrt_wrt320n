@@ -1,0 +1,7 @@
+#!/bin/sh
+
+mkdir /jffs/opt
+mount -o bind /jffs/opt /opt
+wget http://www.3iii.dk/linux/optware/optware-install-ddwrt.sh -O - | tr -d '\r' > /tmp/optware-install.sh
+sh /tmp/optware-install.sh
+export PATH=/opt/bin:/opt/sbin:$PATH
