@@ -1,4 +1,7 @@
 #!/bin/sh
+mount -o bind /jffs/opt /opt
+export PATH=/opt/bin:/opt/sbin:$PATH
+
 mount --bind /jffs/etc/ipkg.conf /etc/ipkg.conf
 for I in `/bin/ls /jffs/etc/init.d/*`;do
     sh $I

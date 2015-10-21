@@ -15,55 +15,63 @@ iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 iptables -I FORWARD -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT -s 10.0.1.0/24 -j ACCEPT
 iptables -A INPUT -s 10.0.0.0/24 -j ACCEPT
-iptables -A INPUT -i $(nvram get wan_ifname) -j ACCEPT
 iptables -A INPUT -i $(nvram get lan_ifname) -j ACCEPT
+
+
+iptables -A INPUT -i $(nvram get wan_ipaddr) -j ACCEPT
+
+
 iptables -A INPUT -i lo -j ACCEPT
 iptables -A INPUT -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -i $(nvram get wan_ifname) -j ACCEPT
 iptables -A OUTPUT -i $(nvram get lan_ifname) -j ACCEPT
 
 iptables -t nat -F
 iptables -t nat -X
 iptables -t nat -Z
-iptables -t nat -A PREROUTING -p tcp -d 10.0.1.1 --dport 8080 -j REDIRECT --to-port 80
-iptables -t nat -A PREROUTING -p tcp -d $(nvram get wan_ipaddr) --dport 22 -j DNAT --to $(nvram get lan_ipaddr):22
-iptables -t nat -A PREROUTING -p tcp -d $(nvram get wan_ipaddr) --dport 23 -j DNAT --to $(nvram get lan_ipaddr):23
-#iptables -t nat -A PREROUTING -d $(nvram get wan_ipaddr) -j DNAT --to $(nvram get lan_ipaddr)
+iptables -t nat -A PREROUTING -p tcp -d $(nvram get wan_ipaddr) --dport 8080 -j REDIRECT --to-port 80
+iptables -t nat -A PREROUTING -p tcp -d $(nvram get lan_ipaddr) --dport 8080 -j REDIRECT --to-port 80
+
+iptables -t nat -A PREROUTING -p tcp -d $(nvram get wan_gateway) -j DNAT --to-destination $(nvram get lan_ipaddr)
+
+iptables -t nat -A PREROUTING -p tcp -d $(nvram get wan_ipaddr) --dport 22 -j DNAT --to-destination $(nvram get lan_ipaddr):22
+iptables -t nat -A PREROUTING -p tcp -d $(nvram get wan_ipaddr) --dport 23 -j DNAT --to-destination $(nvram get lan_ipaddr):23
+
 iptables -t nat -A PREROUTING -p icmp -d $(nvram get wan_ipaddr) -j DNAT --to $(nvram get lan_ipaddr)
 
 server_ip="10.0.1.51"
 for p in 9091 11443 12401 12501 13300 11091; do 
-    for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
-        iptables -t nat -A PREROUTING -p tcp -d $g --dport $p -j DNAT --to-destination $server_ip:$p
-    done
+    
+    # for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
+        iptables -t nat -A PREROUTING -p tcp --dport $p -j DNAT --to-destination $server_ip:$p
+    # done
 done
 
 server_ip="10.0.1.52"
 for p in 80 443 5901 8800 8891 9092 9099 12443 12402 12402 13301 11092 28901; do 
-    for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
-        iptables -t nat -A PREROUTING -p tcp -d $g --dport $p -j DNAT --to-destination $server_ip:$p
-    done
+    # for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
+        iptables -t nat -A PREROUTING -p tcp --dport $p -j DNAT --to-destination $server_ip:$p
+    # done
 done
 
 server_ip="10.0.1.53"
 for p in 8088 8172 8892 9093 12403 23053 11093 50003; do 
-    for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
-        iptables -t nat -A PREROUTING -p tcp -d $g --dport $p -j DNAT --to-destination $server_ip:$p
-    done
+    # for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
+        iptables -t nat -A PREROUTING -p tcp --dport $p -j DNAT --to-destination $server_ip:$p
+    # done
 done
 
 server_ip="10.0.1.54"
 for p in 9094 11094; do 
-    for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
-        iptables -t nat -A PREROUTING -p tcp -d $g --dport $p -j DNAT --to-destination $server_ip:$p
-    done
+    # for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
+        iptables -t nat -A PREROUTING -p tcp --dport $p -j DNAT --to-destination $server_ip:$p
+    # done
 done
 
 server_ip="10.0.1.55"
 for p in 9095 11095; do 
-    for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
-        iptables -t nat -A PREROUTING -p tcp -d $g --dport $p -j DNAT --to-destination $server_ip:$p
-    done
+    # for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
+        iptables -t nat -A PREROUTING -p tcp --dport $p -j DNAT --to-destination $server_ip:$p
+    # done
 done
 
 # server_ip="10.0.1.56"
@@ -87,23 +95,24 @@ done
 # MS1
 server_ip="10.0.1.101"
 for p in 9101; do 
-    for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
-        iptables -t nat -A PREROUTING -p tcp -d $g --dport $p -j DNAT --to-destination $server_ip:$p
-    done
+    # for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
+        iptables -t nat -A PREROUTING -p tcp --dport $p -j DNAT --to-destination $server_ip:$p
+    # done
 done
 
 # SM-N910V
 server_ip="10.0.1.102"
 for p in 9102; do 
-    for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
-        iptables -t nat -A PREROUTING -p tcp -d $g --dport $p -j DNAT --to-destination $server_ip:$p
-    done
+    # for g in $(nvram get wan_gateway) $(nvram get wan_ipaddr) $(nvram get lan_ipaddr); do
+        iptables -t nat -A PREROUTING -p tcp --dport $p -j DNAT --to-destination $server_ip:$p
+    # done
 done
 
-iptables -t nat -A PREROUTING -d $(nvram get wan_ipaddr) -j TRIGGER --trigger-type dnat
-iptables -t nat -A POSTROUTING -o $(nvram get wan_ifname) -j SNAT --to $(nvram get wan_ipaddr)
-iptables -t nat -A POSTROUTING -o $(nvram get lan_ifname) -m pkttype --pkt-type broadcast -j RETURN
-iptables -t nat -A POSTROUTING -o $(nvram get lan_ifname) -s 10.0.1.0/24 -d 10.0.1.0/24 -j MASQUERADE
+iptables -t nat -A PREROUTING -d $(nvram get wan_ipaddr) -j TRIGGER --trigger-type DNAT
+
+#iptables -t nat -A POSTROUTING -o $(nvram get wan_ifname) -j SNAT --to $(nvram get wan_ipaddr)
+#iptables -t nat -A POSTROUTING -o $(nvram get lan_ifname) -m pkttype --pkt-type broadcast -j RETURN
+#iptables -t nat -A POSTROUTING -o $(nvram get lan_ifname) -s 10.0.1.0/24 -d 10.0.1.0/24 -j MASQUERADE
 
 
 #CURRENT_EXT=`echo $0 | sed -r 's/(.*)\.([a-zA-Z0-9]+)$/\2/g'`
